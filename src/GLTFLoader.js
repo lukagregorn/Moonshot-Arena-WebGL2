@@ -9,6 +9,7 @@ import PerspectiveCamera from './PerspectiveCamera.js';
 import OrthographicCamera from './OrthographicCamera.js';
 import Node from './Node.js';
 import Scene from './Scene.js';
+import Player from './Player.js';
 
 const vec3 = glMatrix.vec3;
 const vec4 = glMatrix.vec4;
@@ -296,7 +297,13 @@ export default class GLTFLoader {
             options.mesh = await this.loadMesh(gltfSpec.mesh);
         }
 
-        const node = new Node(options);
+        let node;
+        if (gltfSpec.name == "Player") {
+            node = new Player(options);
+        } else {
+            node = new Node(options);
+        }
+
         this.cache.set(gltfSpec, node);
         return node;
     }

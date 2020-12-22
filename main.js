@@ -2,6 +2,7 @@ import Application from './src/Application.js';
 import * as WebGL from './src/WebGL.js';
 import GLTFLoader from './src/GLTFLoader.js';
 import Renderer from './src/Renderer.js';
+import Player from './src/Player.js';
 
 const mat4 = glMatrix.mat4;
 
@@ -40,14 +41,14 @@ class App extends Application {
     }
 
     pointerlockchangeHandler() {
-        if (!this.camera) {
+        if (!this.camera || !this.player) {
             return;
         }
 
         if (document.pointerLockElement === this.canvas) {
-            //this.camera.camera.enable();
+            this.player.enableMouseLock();
         } else {
-            //this.camera.camera.disable();
+            this.player.disableMouseLock();
         }
     }
 
@@ -56,8 +57,8 @@ class App extends Application {
         const dt = (this.time - this.startTime) * 0.001;
         this.startTime = this.time;
 
-        if (this.camera) {
-            // this.camera.camera.update(dt);
+        if (this.player) {
+            this.player.update(dt);
         }
     }
 

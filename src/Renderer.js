@@ -157,6 +157,7 @@ export default class Renderer {
 
     prepareScene(scene) {
         for (const node of scene.nodes) {
+            console.log(node);
             this.prepareNode(node);
         }
     }

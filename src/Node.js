@@ -24,6 +24,7 @@ export default class Node {
             this.updateMatrix();
         }
 
+        this.name = options.name || null;
         this.camera = options.camera || null;
         this.mesh = options.mesh || null;
 
