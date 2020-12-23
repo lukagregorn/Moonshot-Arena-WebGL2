@@ -18,18 +18,30 @@ export default class Player extends Node {
         this.velocity = [0, 0, 0];
         this.r = [0, 0, 0];
         this.mouseSensitivity = 0.002;
-        this.maxSpeed = 3;
+        this.maxSpeed = 6;
         this.friction = 0.2;
         this.acceleration = 20;
+
+        this.canJump = true;
+        this.jumping = false;
+        this.jumpPower = 40;
+        this.jumpTime = .2;
+        this.jumpCooldown = .6;
     }
 
 
     update(dt) {
         const c = this;
+        const jt = 0.2;
+        const jc = 0.6;
+        
         const forward = vec3.set(vec3.create(),
             -Math.sin(c.r[1]), 0, -Math.cos(c.r[1]));
+        
         const right = vec3.set(vec3.create(),
             Math.cos(c.r[1]), 0, -Math.sin(c.r[1]));
+        
+        const up = vec3.set(vec3.create(), 0, 1, 0);
 
         // 1: add movement acceleration
         let acc = vec3.create();
@@ -45,6 +57,42 @@ export default class Player extends Node {
         if (this.keys['KeyA']) {
             vec3.sub(acc, acc, right);
         }
+
+        // Jump logic
+        if (this.keys['Space']) {
+            if (this.canJump) {
+                this.jumping = true;
+                this.canJump = false;
+            }
+        }
+
+        if (this.jumping) {
+            this.jumpTime -= dt;
+            if (this.jumpTime <= 0) {
+                this.jumpTime = jt;
+                this.jumping = false;
+            } else {
+                const jumpVec = vec3.scale(vec3.create(), up, c.jumpPower * c.jumpTime);
+                vec3.add(acc, acc, jumpVec);
+            }
+        } else {
+            // dont let me fall off the earth
+            if (c.translation[1] < 3) {
+                c.translation[1] = 3;
+            } else {
+                // Gravity
+                vec3.sub(acc, acc, vec3.scale(vec3.create(), up, 4 * (1-c.jumpCooldown)));
+            }
+
+            if (!this.canJump) {
+                this.jumpCooldown -= dt;
+                if (this.jumpCooldown <= 0) {
+                    this.jumpCooldown = jc;
+                    this.canJump = true;
+                }
+            }
+        }
+        
 
         // 2: update velocity
         vec3.scaleAndAdd(c.velocity, c.velocity, acc, dt * c.acceleration);
@@ -67,6 +115,7 @@ export default class Player extends Node {
         // do last two in physics module
         // 5: update translation
         vec3.scaleAndAdd(c.translation, c.translation, c.velocity, dt);
+
 
         // 6: update matrix
         this.updateMatrix();

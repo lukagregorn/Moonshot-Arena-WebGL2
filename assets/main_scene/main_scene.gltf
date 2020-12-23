@@ -12,7 +12,7 @@
                 1,
                 2,
                 3,
-                6
+                8
             ]
         }
     ],
@@ -107,10 +107,46 @@
             ]
         },
         {
-            "children" : [
-                5
-            ],
             "mesh" : 4,
+            "name" : "Gun",
+            "rotation" : [
+                0,
+                -0.6755902171134949,
+                0,
+                0.7372773885726929
+            ],
+            "scale" : [
+                0.0484614260494709,
+                0.0484614260494709,
+                0.0484614260494709
+            ],
+            "translation" : [
+                0.9804306030273438,
+                0.523979663848877,
+                -1.7122468948364258
+            ]
+        },
+        {
+            "mesh" : 5,
+            "name" : "ShootPoint",
+            "scale" : [
+                0.008489315398037434,
+                0.008489315398037434,
+                0.008489315398037434
+            ],
+            "translation" : [
+                0.8331403732299805,
+                0.541987419128418,
+                -3.4017839431762695
+            ]
+        },
+        {
+            "children" : [
+                5,
+                6,
+                7
+            ],
+            "mesh" : 6,
             "name" : "Player",
             "translation" : [
                 -13.149596214294434,
@@ -124,8 +160,8 @@
             "name" : "Camera",
             "perspective" : {
                 "aspectRatio" : 1.7777777777777777,
-                "yfov" : 1.1,
-                "zfar" : 100000,
+                "yfov" : 1.1283951805128494,
+                "zfar" : 1000000,
                 "znear" : 0.10000000149011612
             },
             "type" : "perspective"
@@ -203,7 +239,7 @@
             ]
         },
         {
-            "name" : "Cylinder",
+            "name" : "Cube.004",
             "primitives" : [
                 {
                     "attributes" : {
@@ -212,6 +248,34 @@
                         "TEXCOORD_0" : 16
                     },
                     "indices" : 17,
+                    "material" : 0
+                }
+            ]
+        },
+        {
+            "name" : "Cube.005",
+            "primitives" : [
+                {
+                    "attributes" : {
+                        "POSITION" : 18,
+                        "NORMAL" : 19,
+                        "TEXCOORD_0" : 20
+                    },
+                    "indices" : 7,
+                    "material" : 0
+                }
+            ]
+        },
+        {
+            "name" : "Cylinder",
+            "primitives" : [
+                {
+                    "attributes" : {
+                        "POSITION" : 21,
+                        "NORMAL" : 22,
+                        "TEXCOORD_0" : 23
+                    },
+                    "indices" : 24,
                     "material" : 0
                 }
             ]
@@ -358,6 +422,68 @@
         {
             "bufferView" : 14,
             "componentType" : 5126,
+            "count" : 316,
+            "max" : [
+                1.2629950046539307,
+                2.444256544113159,
+                1.6125234365463257
+            ],
+            "min" : [
+                -35.18730926513672,
+                -7.6609578132629395,
+                -1.612524390220642
+            ],
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 15,
+            "componentType" : 5126,
+            "count" : 316,
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 16,
+            "componentType" : 5126,
+            "count" : 316,
+            "type" : "VEC2"
+        },
+        {
+            "bufferView" : 17,
+            "componentType" : 5123,
+            "count" : 468,
+            "type" : "SCALAR"
+        },
+        {
+            "bufferView" : 18,
+            "componentType" : 5126,
+            "count" : 24,
+            "max" : [
+                1,
+                1,
+                1
+            ],
+            "min" : [
+                -1,
+                -1,
+                -1
+            ],
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 19,
+            "componentType" : 5126,
+            "count" : 24,
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 20,
+            "componentType" : 5126,
+            "count" : 24,
+            "type" : "VEC2"
+        },
+        {
+            "bufferView" : 21,
+            "componentType" : 5126,
             "count" : 192,
             "max" : [
                 1,
@@ -372,19 +498,19 @@
             "type" : "VEC3"
         },
         {
-            "bufferView" : 15,
+            "bufferView" : 22,
             "componentType" : 5126,
             "count" : 192,
             "type" : "VEC3"
         },
         {
-            "bufferView" : 16,
+            "bufferView" : 23,
             "componentType" : 5126,
             "count" : 192,
             "type" : "VEC2"
         },
         {
-            "bufferView" : 17,
+            "bufferView" : 24,
             "componentType" : 5123,
             "count" : 372,
             "type" : "SCALAR"
@@ -463,23 +589,58 @@
         },
         {
             "buffer" : 0,
-            "byteLength" : 2304,
+            "byteLength" : 3792,
             "byteOffset" : 3216
         },
         {
             "buffer" : 0,
+            "byteLength" : 3792,
+            "byteOffset" : 7008
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 2528,
+            "byteOffset" : 10800
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 936,
+            "byteOffset" : 13328
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 288,
+            "byteOffset" : 14264
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 288,
+            "byteOffset" : 14552
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 192,
+            "byteOffset" : 14840
+        },
+        {
+            "buffer" : 0,
             "byteLength" : 2304,
-            "byteOffset" : 5520
+            "byteOffset" : 15032
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 2304,
+            "byteOffset" : 17336
         },
         {
             "buffer" : 0,
             "byteLength" : 1536,
-            "byteOffset" : 7824
+            "byteOffset" : 19640
         },
         {
             "buffer" : 0,
             "byteLength" : 744,
-            "byteOffset" : 9360
+            "byteOffset" : 21176
         }
     ],
     "samplers" : [
@@ -490,7 +651,7 @@
     ],
     "buffers" : [
         {
-            "byteLength" : 10104,
+            "byteLength" : 21920,
             "uri" : "main_scene.bin"
         }
     ]
