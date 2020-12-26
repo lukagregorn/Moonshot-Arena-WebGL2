@@ -2,7 +2,7 @@ import Application from './src/Application.js';
 import * as WebGL from './src/WebGL.js';
 import GLTFLoader from './src/GLTFLoader.js';
 import Renderer from './src/Renderer.js';
-import Player from './src/Player.js';
+import Physics from './src/Physics.js';
 
 const mat4 = glMatrix.mat4;
 
@@ -13,7 +13,7 @@ class App extends Application {
         await this.loader.load('./assets/main_scene/main_scene.gltf');
 
         this.scene = await this.loader.loadScene(this.loader.defaultScene);
-        this.camera = await this.loader.loadNode('Camera');
+        this.camera = await this.loader.loadNode('Camera_Orientation');
         this.player = await this.loader.loadNode('Player');
 
         if (!this.scene || !this.camera) {
@@ -26,6 +26,13 @@ class App extends Application {
 
         this.renderer = new Renderer(this.gl);
         this.renderer.prepareScene(this.scene);
+    
+        this.physics = new Physics();
+        await this.physics.init();
+        this.physics.loaded = true;
+        console.log(this.physics);
+        this.physics.prepareWorld(this.scene);
+
         this.time = Date.now();
         this.startTime = this.time;
         this.aspect = 1;
@@ -59,6 +66,12 @@ class App extends Application {
 
         if (this.player) {
             this.player.update(dt);
+        }
+
+        if (this.physics) {
+            if (this.physics.loaded) {
+                this.physics.update(dt);
+            }
         }
     }
 

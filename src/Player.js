@@ -17,10 +17,11 @@ export default class Player extends Node {
         // movement
         this.velocity = [0, 0, 0];
         this.r = [0, 0, 0];
+        this.acceleration = [0, 0, 0];
         this.mouseSensitivity = 0.002;
         this.maxSpeed = 6;
+        this.speed = 20;
         this.friction = 0.2;
-        this.acceleration = 20;
 
         this.canJump = true;
         this.jumping = false;
@@ -34,6 +35,8 @@ export default class Player extends Node {
         const c = this;
         const jt = 0.2;
         const jc = 0.6;
+
+        c.acceleration = vec3.create();
         
         const forward = vec3.set(vec3.create(),
             -Math.sin(c.r[1]), 0, -Math.cos(c.r[1]));
@@ -44,7 +47,7 @@ export default class Player extends Node {
         const up = vec3.set(vec3.create(), 0, 1, 0);
 
         // 1: add movement acceleration
-        let acc = vec3.create();
+        let acc = c.acceleration;
         if (this.keys['KeyW']) {
             vec3.add(acc, acc, forward);
         }
@@ -78,10 +81,10 @@ export default class Player extends Node {
         } else {
             // dont let me fall off the earth
             if (c.translation[1] < 3) {
-                c.translation[1] = 3;
+                //c.translation[1] = 3;
             } else {
                 // Gravity
-                vec3.sub(acc, acc, vec3.scale(vec3.create(), up, 4 * (1-c.jumpCooldown)));
+                //vec3.sub(acc, acc, vec3.scale(vec3.create(), up, 4 * (1-c.jumpCooldown)));
             }
 
             if (!this.canJump) {
@@ -94,8 +97,12 @@ export default class Player extends Node {
         }
         
 
+        // scale acceleration
+        vec3.scale(acc, acc, dt * c.speed);
+
+
         // 2: update velocity
-        vec3.scaleAndAdd(c.velocity, c.velocity, acc, dt * c.acceleration);
+        vec3.scaleAndAdd(c.velocity, c.velocity, acc, dt * c.speed);
 
         // 3: if no movement, apply friction
         if (!this.keys['KeyW'] &&
@@ -114,11 +121,11 @@ export default class Player extends Node {
 
         // do last two in physics module
         // 5: update translation
-        vec3.scaleAndAdd(c.translation, c.translation, c.velocity, dt);
+        //vec3.scaleAndAdd(c.translation, c.translation, c.velocity, dt);
 
 
         // 6: update matrix
-        this.updateMatrix();
+        //this.updateMatrix();
     }
 
     enableMouseLock() {

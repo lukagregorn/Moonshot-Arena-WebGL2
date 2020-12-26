@@ -28,12 +28,17 @@ export default class Node {
         this.camera = options.camera || null;
         this.mesh = options.mesh || null;
 
+        if (options.extras) {
+            this.dynamic = options.extras.dynamic; // 0 or 1   if null dont give it physics at all
+        }
 
         this.children = [...(options.children || [])];
         for (const child of this.children) {
             child.parent = this;
         }
         this.parent = null;
+
+        //console.log(this.name, this.dynamic, this.scale, this.translation, this.mesh)
     }
 
     updateTransform() {
