@@ -14,27 +14,33 @@ export default class Player extends Node {
         this.keyupHandler = this.keyupHandler.bind(this);
         this.keys = {};
 
+        this.head = null;
+        
+        //physics
+        this.isHumanoid = true;
+
         // movement
         this.velocity = [0, 0, 0];
         this.r = [0, 0, 0];
         this.acceleration = [0, 0, 0];
+        this.jumpForce = [0,0,0];
         this.mouseSensitivity = 0.002;
-        this.maxSpeed = 6;
-        this.speed = 20;
+        this.maxSpeed = 10;
+        this.speed = 15;
         this.friction = 0.2;
 
         this.canJump = true;
         this.jumping = false;
-        this.jumpPower = 40;
-        this.jumpTime = .2;
-        this.jumpCooldown = .6;
+        this.jumpPower = 45;
+        this.jumpTime = .1;
+        this.jumpCooldown = 2.5;
     }
 
 
     update(dt) {
         const c = this;
-        const jt = 0.2;
-        const jc = 0.6;
+        const jt = 0.1;
+        const jc = 2.5;
 
         c.acceleration = vec3.create();
         
@@ -75,18 +81,10 @@ export default class Player extends Node {
                 this.jumpTime = jt;
                 this.jumping = false;
             } else {
-                const jumpVec = vec3.scale(vec3.create(), up, c.jumpPower * c.jumpTime);
-                vec3.add(acc, acc, jumpVec);
+                this.jumpForce = vec3.scale(vec3.create(), up, c.jumpPower * c.jumpTime);
             }
         } else {
-            // dont let me fall off the earth
-            if (c.translation[1] < 3) {
-                //c.translation[1] = 3;
-            } else {
-                // Gravity
-                //vec3.sub(acc, acc, vec3.scale(vec3.create(), up, 4 * (1-c.jumpCooldown)));
-            }
-
+            this.jumpForce = [0,0,0];
             if (!this.canJump) {
                 this.jumpCooldown -= dt;
                 if (this.jumpCooldown <= 0) {
@@ -96,10 +94,6 @@ export default class Player extends Node {
             }
         }
         
-
-        // scale acceleration
-        vec3.scale(acc, acc, dt * c.speed);
-
 
         // 2: update velocity
         vec3.scaleAndAdd(c.velocity, c.velocity, acc, dt * c.speed);
@@ -116,16 +110,12 @@ export default class Player extends Node {
         // 4: limit speed
         const len = vec3.len(c.velocity);
         if (len > c.maxSpeed) {
-            vec3.scale(c.velocity, c.velocity, c.maxSpeed / len);
+            vec3.scale(c.velocity, c.velocity, (c.maxSpeed-1) / len);
         }
 
-        // do last two in physics module
-        // 5: update translation
-        //vec3.scaleAndAdd(c.translation, c.translation, c.velocity, dt);
+        // scale acceleration
+        vec3.scale(acc, acc, dt * c.speed);
 
-
-        // 6: update matrix
-        //this.updateMatrix();
     }
 
     enableMouseLock() {
@@ -163,10 +153,14 @@ export default class Player extends Node {
             c.r[0] = -halfpi;
         }
 
+        //c.r[0] -= halfpi/2;
         c.r[1] = ((c.r[1] % twopi) + twopi) % twopi;
 
         const degrees = c.r.map(x => x * 180 / pi);
-        quat.fromEuler(c.rotation, ...degrees)
+        quat.fromEuler(c.cameraNode.rotation, ...degrees)
+
+        // update camera node rotation
+        c.cameraNode.updateMatrix();
     }
 
     keydownHandler(e) {
@@ -175,6 +169,10 @@ export default class Player extends Node {
 
     keyupHandler(e) {
         this.keys[e.code] = false;
+    }
+
+    setCameraNode(camNode) {
+        this.cameraNode = camNode;
     }
 
 }

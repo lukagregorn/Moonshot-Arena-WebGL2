@@ -15,14 +15,19 @@ class App extends Application {
         this.scene = await this.loader.loadScene(this.loader.defaultScene);
         this.camera = await this.loader.loadNode('Camera_Orientation');
         this.player = await this.loader.loadNode('Player');
+        this.head = await this.loader.loadNode('Head');
 
+        
         if (!this.scene || !this.camera) {
             throw new Error('Scene or Camera not present in glTF');
         }
-
+        
         if (!this.camera.camera) {
             throw new Error('Camera node does not contain a camera reference');
         }
+
+        // give player a camera reference
+        this.player.setCameraNode(this.head);
 
         this.renderer = new Renderer(this.gl);
         this.renderer.prepareScene(this.scene);
@@ -30,7 +35,7 @@ class App extends Application {
         this.physics = new Physics();
         await this.physics.init();
         this.physics.loaded = true;
-        console.log(this.physics);
+        //console.log(this.physics);
         this.physics.prepareWorld(this.scene);
 
         this.time = Date.now();

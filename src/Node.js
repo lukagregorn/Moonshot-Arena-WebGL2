@@ -28,6 +28,8 @@ export default class Node {
         this.camera = options.camera || null;
         this.mesh = options.mesh || null;
 
+        this.colliding = false;
+        
         if (options.extras) {
             this.dynamic = options.extras.dynamic; // 0 or 1   if null dont give it physics at all
         }

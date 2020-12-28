@@ -1,8 +1,10 @@
+const vec3 = glMatrix.vec3;
+const GRAVITY = [0, -9.82, 0];
+
 export default class Physics {
 
     constructor() {
         this.loaded = false;
-        this.init = this.init.bind(this);
     }
 
     async init() {
@@ -19,7 +21,7 @@ export default class Physics {
             self.objects = [];
             self.tmpTransform = new Ammo.btTransform();
             self.dynamicsWorld = new Ammo.btDiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfiguration);
-            self.dynamicsWorld.setGravity(new Ammo.btVector3(0, -9.8, 0));
+            self.dynamicsWorld.setGravity(new Ammo.btVector3(...GRAVITY));
         })
     }
     
@@ -27,10 +29,26 @@ export default class Physics {
     applyForces() {
         const Ammo = this.Ammo;
         for(const node of this.objects) {
-            if (node.dynamic == 1 && node.acceleration != null) {
+            if (node.dynamic == 1) {
                 const body = node.body;
+                
+                
+                const currentVelocity = body.getLinearVelocity();
+                const currentVelocityVec = [currentVelocity.x(), currentVelocity.y(), currentVelocity.z()];
+                const nextSpeed = vec3.add(vec3.create(), currentVelocityVec, node.acceleration);
+                
+                /*
+                if (vec3.length(nextSpeed) > node.maxSpeed) {
+                    vec3.negate(node.acceleration, node.acceleration)
+                }
+                */
                 this.setBodyRotation(body, node.rotation)
                 body.applyImpulse(new Ammo.btVector3(...node.acceleration), new Ammo.btVector3(0,0,0));
+
+                // apply jump force after speed
+                if (node.jumpForce) {
+                    body.applyImpulse(new Ammo.btVector3(...node.jumpForce), new Ammo.btVector3(0,0,0));
+                }
 
             }
         }
@@ -45,6 +63,8 @@ export default class Physics {
                 //this.updateNodeRotaton(node);
                 node.updateMatrix();
             }
+
+            node.colliding = false;
         }
 
         this.detectCollision();
@@ -79,6 +99,9 @@ export default class Physics {
                 let distance = contactPoint.getDistance();
     
                 if( distance > 0.0 ) continue;
+
+                node0.colliding = true;
+                node1.colliding = true;
 
                 if (tag0 == "bullet" && tag1 == "hittable") {
                     node1.destroy()
@@ -138,15 +161,30 @@ export default class Physics {
 
         let mass = node.dynamic;
         let localInertia = new Ammo.btVector3(0, 0, 0);
-        let boxShape = new Ammo.btBoxShape(new Ammo.btVector3(...node.scale));
-        boxShape.calculateLocalInertia(mass, localInertia);
+        let shape;
+        if (node.isHumanoid) {
+            shape = new Ammo.btCylinderShape(new Ammo.btVector3(...node.scale));
+        } else {
+            shape = new Ammo.btBoxShape(new Ammo.btVector3(...node.scale));
+        }
+
+        shape.calculateLocalInertia(mass, localInertia);
     
         let myMotionState = new Ammo.btDefaultMotionState(startTransform);
-        let rbInfo = new Ammo.btRigidBodyConstructionInfo(mass, myMotionState, boxShape, localInertia);
+        let rbInfo = new Ammo.btRigidBodyConstructionInfo(mass, myMotionState, shape, localInertia);
         let body = new Ammo.btRigidBody(rbInfo);
 
         this.setBodyPosition(body, node.translation);
         this.setBodyRotation(body, node.rotation);
+        
+        if (node.isHumanoid) {
+            body.setFriction(.5);
+            body.setDamping(.65, 1);            
+        } else {
+            body.setFriction(1.1);
+        }
+
+        //body.setGravity(new Ammo.btVector3(...GRAVITY))
         
         body.setActivationState(4) // DISABLE_DEACTIVATION
 
