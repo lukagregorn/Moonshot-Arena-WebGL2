@@ -6,6 +6,17 @@
     "scene" : 0,
     "scenes" : [
         {
+            "extras" : {
+                "glTF2ExportSettings" : {
+                    "export_animations" : 0,
+                    "export_cameras" : 1,
+                    "export_colors" : 0,
+                    "export_extras" : 1,
+                    "export_format" : "GLTF_SEPARATE",
+                    "export_morph" : 0,
+                    "export_skins" : 0
+                }
+            },
             "name" : "Scene",
             "nodes" : [
                 0,
@@ -13,7 +24,9 @@
                 2,
                 3,
                 9,
-                10
+                10,
+                11,
+                12
             ]
         }
     ],
@@ -25,9 +38,9 @@
             "mesh" : 0,
             "name" : "Cube",
             "scale" : [
-                22.292171478271484,
+                36.24282455444336,
                 1,
-                24.220378875732422
+                40.27396774291992
             ],
             "translation" : [
                 0,
@@ -214,6 +227,46 @@
                 0.7974075078964233,
                 -15.438241004943848
             ]
+        },
+        {
+            "extras" : {
+                "dynamic" : 0
+            },
+            "mesh" : 7,
+            "name" : "Bullet",
+            "scale" : [
+                0.09891318529844284,
+                0.09891318529844284,
+                0.09891318529844284
+            ],
+            "translation" : [
+                0,
+                -3.0537285804748535,
+                0
+            ]
+        },
+        {
+            "extras" : {
+                "dynamic" : 0
+            },
+            "mesh" : 8,
+            "name" : "Cube.005",
+            "rotation" : [
+                -0.006715218536555767,
+                0.16026422381401062,
+                0.015890268608927727,
+                0.9869233965873718
+            ],
+            "scale" : [
+                12.150233268737793,
+                5.4925103187561035,
+                2.1058218479156494
+            ],
+            "translation" : [
+                14.761678695678711,
+                3.1006343364715576,
+                -22.532846450805664
+            ]
         }
     ],
     "cameras" : [
@@ -238,6 +291,21 @@
             "pbrMetallicRoughness" : {
                 "baseColorTexture" : {
                     "index" : 0,
+                    "texCoord" : 0
+                },
+                "metallicFactor" : 0,
+                "roughnessFactor" : 0.4000000059604645
+            }
+        },
+        {
+            "doubleSided" : true,
+            "extras" : {
+                "dynamic" : 0
+            },
+            "name" : "Material.001",
+            "pbrMetallicRoughness" : {
+                "baseColorTexture" : {
+                    "index" : 1,
                     "texCoord" : 0
                 },
                 "metallicFactor" : 0,
@@ -343,12 +411,44 @@
                     "material" : 0
                 }
             ]
+        },
+        {
+            "name" : "Cube.007",
+            "primitives" : [
+                {
+                    "attributes" : {
+                        "POSITION" : 24,
+                        "NORMAL" : 25,
+                        "TEXCOORD_0" : 26
+                    },
+                    "indices" : 7,
+                    "material" : 0
+                }
+            ]
+        },
+        {
+            "name" : "Cube.008",
+            "primitives" : [
+                {
+                    "attributes" : {
+                        "POSITION" : 27,
+                        "NORMAL" : 28,
+                        "TEXCOORD_0" : 29
+                    },
+                    "indices" : 7,
+                    "material" : 1
+                }
+            ]
         }
     ],
     "textures" : [
         {
             "sampler" : 0,
             "source" : 0
+        },
+        {
+            "sampler" : 0,
+            "source" : 1
         }
     ],
     "images" : [
@@ -356,6 +456,11 @@
             "mimeType" : "image/png",
             "name" : "mainTexture",
             "uri" : "mainTexture.png"
+        },
+        {
+            "mimeType" : "image/png",
+            "name" : "mainTexture.png",
+            "uri" : "mainTexture_png.png"
         }
     ],
     "accessors" : [
@@ -572,6 +677,62 @@
             "componentType" : 5126,
             "count" : 24,
             "type" : "VEC2"
+        },
+        {
+            "bufferView" : 24,
+            "componentType" : 5126,
+            "count" : 24,
+            "max" : [
+                1,
+                1,
+                1
+            ],
+            "min" : [
+                -1,
+                -1,
+                -1
+            ],
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 25,
+            "componentType" : 5126,
+            "count" : 24,
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 26,
+            "componentType" : 5126,
+            "count" : 24,
+            "type" : "VEC2"
+        },
+        {
+            "bufferView" : 27,
+            "componentType" : 5126,
+            "count" : 24,
+            "max" : [
+                1,
+                1,
+                1
+            ],
+            "min" : [
+                -1,
+                -1,
+                -1
+            ],
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 28,
+            "componentType" : 5126,
+            "count" : 24,
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 29,
+            "componentType" : 5126,
+            "count" : 24,
+            "type" : "VEC2"
         }
     ],
     "bufferViews" : [
@@ -694,6 +855,36 @@
             "buffer" : 0,
             "byteLength" : 192,
             "byteOffset" : 15608
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 288,
+            "byteOffset" : 15800
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 288,
+            "byteOffset" : 16088
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 192,
+            "byteOffset" : 16376
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 288,
+            "byteOffset" : 16568
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 288,
+            "byteOffset" : 16856
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 192,
+            "byteOffset" : 17144
         }
     ],
     "samplers" : [
@@ -704,7 +895,7 @@
     ],
     "buffers" : [
         {
-            "byteLength" : 15800,
+            "byteLength" : 17336,
             "uri" : "main_scene.bin"
         }
     ]

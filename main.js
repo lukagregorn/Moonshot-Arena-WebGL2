@@ -15,8 +15,13 @@ class App extends Application {
         this.scene = await this.loader.loadScene(this.loader.defaultScene);
         this.camera = await this.loader.loadNode('Camera_Orientation');
         this.player = await this.loader.loadNode('Player');
-        this.head = await this.loader.loadNode('Head');
+        const head = await this.loader.loadNode('Head');
+        const shootPoint = await this.loader.loadNode('ShootPoint');
 
+
+        const prefabs = {
+            bullet: await this.loader.loadNode('Bullet')
+        }
         
         if (!this.scene || !this.camera) {
             throw new Error('Scene or Camera not present in glTF');
@@ -26,8 +31,12 @@ class App extends Application {
             throw new Error('Camera node does not contain a camera reference');
         }
 
+        if (!prefabs.bullet) {
+            throw new Error('Where is my bullet :/');
+        }
+
         // give player a camera reference
-        this.player.setCameraNode(this.head);
+        this.player.init(head, shootPoint, prefabs);
 
         this.renderer = new Renderer(this.gl);
         this.renderer.prepareScene(this.scene);

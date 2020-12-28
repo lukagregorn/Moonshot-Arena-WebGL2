@@ -15,9 +15,17 @@ export default class Player extends Node {
         this.keys = {};
 
         this.head = null;
+        this.prefabs = null;
         
-        //physics
+        // physics
         this.isHumanoid = true;
+        this.tag = "player";
+        this.hitIgnoreTags = [];
+
+        // shooting
+        this.shoot = this.shoot.bind(this);
+        this.canShoot;
+        this.fireRate = 0.5;
 
         // movement
         this.velocity = [0, 0, 0];
@@ -41,17 +49,17 @@ export default class Player extends Node {
         const c = this;
         const jt = 0.1;
         const jc = 2.5;
-
+        
         c.acceleration = vec3.create();
         
         const forward = vec3.set(vec3.create(),
-            -Math.sin(c.r[1]), 0, -Math.cos(c.r[1]));
+        -Math.sin(c.r[1]), 0, -Math.cos(c.r[1]));
         
         const right = vec3.set(vec3.create(),
-            Math.cos(c.r[1]), 0, -Math.sin(c.r[1]));
+        Math.cos(c.r[1]), 0, -Math.sin(c.r[1]));
         
         const up = vec3.set(vec3.create(), 0, 1, 0);
-
+        
         // 1: add movement acceleration
         let acc = c.acceleration;
         if (this.keys['KeyW']) {
@@ -66,7 +74,7 @@ export default class Player extends Node {
         if (this.keys['KeyA']) {
             vec3.sub(acc, acc, right);
         }
-
+        
         // Jump logic
         if (this.keys['Space']) {
             if (this.canJump) {
@@ -94,7 +102,7 @@ export default class Player extends Node {
             }
         }
         
-
+        
         // 2: update velocity
         vec3.scaleAndAdd(c.velocity, c.velocity, acc, dt * c.speed);
 
@@ -115,17 +123,51 @@ export default class Player extends Node {
 
         // scale acceleration
         vec3.scale(acc, acc, dt * c.speed);
-
+        
+        // fire rate cooldown
+        const fr = 0.5;
+        if (!this.canFire) {
+            this.fireRate -= dt;
+            if (this.fireRate <= 0) {
+                this.canFire = true;
+                this.fireRate = fr;
+            }
+        }
     }
+    
+    
+    shoot() {
+        if ((!this.prefabs && this.prefabs.bullet) || !this.canFire) {
+            return;
+        }
+
+        this.canFire = false;
+
+        const pos = mat4.getTranslation(vec3.create(), this.shootPoint.getGlobalMatrix());
+        const q = mat4.getRotation(quat.create(), this.head.children[0].children[1].getGlobalMatrix());
+        const direction = [
+            2 * (q[0] * q[2] + q[3] * q[1]),
+            2 * (q[1] * q[2] - q[3] * q[0]),
+            1 - 2 * (q[0] * q[0] + q[1] * q[1])
+        ];
+
+        vec3.negate(direction, direction);
+
+        const bullet = this.prefabs.bullet.clone();
+        bullet.fire(pos, q, direction, ["player"]);
+    }
+
 
     enableMouseLock() {
         document.addEventListener('mousemove', this.mousemoveHandler);
+        document.addEventListener('mousedown', this.shoot);
         document.addEventListener('keydown', this.keydownHandler);
         document.addEventListener('keyup', this.keyupHandler);
     }
 
     disableMouseLock() {
         document.removeEventListener('mousemove', this.mousemoveHandler);
+        document.removeEventListener('mousedown', this.shoot);
         document.removeEventListener('keydown', this.keydownHandler);
         document.removeEventListener('keyup', this.keyupHandler);
 
@@ -157,11 +199,12 @@ export default class Player extends Node {
         c.r[1] = ((c.r[1] % twopi) + twopi) % twopi;
 
         const degrees = c.r.map(x => x * 180 / pi);
-        quat.fromEuler(c.cameraNode.rotation, ...degrees)
+        quat.fromEuler(c.head.rotation, ...degrees)
 
         // update camera node rotation
-        c.cameraNode.updateMatrix();
+        c.head.updateMatrix();
     }
+
 
     keydownHandler(e) {
         this.keys[e.code] = true;
@@ -171,8 +214,10 @@ export default class Player extends Node {
         this.keys[e.code] = false;
     }
 
-    setCameraNode(camNode) {
-        this.cameraNode = camNode;
+    init(head, shootPoint, prefabs) {
+        this.head = head;
+        this.shootPoint = shootPoint;
+        this.prefabs = prefabs;
     }
 
 }

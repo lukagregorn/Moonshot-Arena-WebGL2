@@ -19,29 +19,24 @@ export default class Physics {
             let solver = new Ammo.btSequentialImpulseConstraintSolver();
             
             self.objects = [];
+            self.queue = [];
             self.tmpTransform = new Ammo.btTransform();
             self.dynamicsWorld = new Ammo.btDiscreteDynamicsWorld(dispatcher, overlappingPairCache, solver, collisionConfiguration);
             self.dynamicsWorld.setGravity(new Ammo.btVector3(...GRAVITY));
         })
     }
     
+    addObjectsInQueue() {
+        while (this.queue.length > 0) {
+            this.objects.push(this.queue.pop());
+        }
+    }
 
     applyForces() {
         const Ammo = this.Ammo;
         for(const node of this.objects) {
+            const body = node.body;
             if (node.dynamic == 1) {
-                const body = node.body;
-                
-                
-                const currentVelocity = body.getLinearVelocity();
-                const currentVelocityVec = [currentVelocity.x(), currentVelocity.y(), currentVelocity.z()];
-                const nextSpeed = vec3.add(vec3.create(), currentVelocityVec, node.acceleration);
-                
-                /*
-                if (vec3.length(nextSpeed) > node.maxSpeed) {
-                    vec3.negate(node.acceleration, node.acceleration)
-                }
-                */
                 this.setBodyRotation(body, node.rotation)
                 body.applyImpulse(new Ammo.btVector3(...node.acceleration), new Ammo.btVector3(0,0,0));
 
@@ -50,15 +45,22 @@ export default class Physics {
                     body.applyImpulse(new Ammo.btVector3(...node.jumpForce), new Ammo.btVector3(0,0,0));
                 }
 
+            } else if (node.dynamic == 2) {
+                this.setBodyRotation(body, node.rotation);
+                body.setLinearVelocity(new Ammo.btVector3(...node.velocity));
             }
         }
     }
 
     update(dt) {
+        //console.log(this.objects);
+        // add prefabs waiting to get added
+        this.addObjectsInQueue();
+
         this.applyForces();
-        this.dynamicsWorld.stepSimulation(dt, 2);
+        this.dynamicsWorld.stepSimulation(dt, 1);
         for(const node of this.objects) {
-            if (node.dynamic == 1) {
+            if (node.dynamic > 0) {
                 this.updateNodePosition(node);
                 //this.updateNodeRotaton(node);
                 node.updateMatrix();
@@ -88,8 +90,8 @@ export default class Physics {
 
             if ( ! node0 && ! node1 ) continue;
             
-            let tag0 = node0 ? node0.tag : "none";
-            let tag1 = node1 ? node1.tag : "none";
+            let tag0 = node0.tag || "none";
+            let tag1 = node1.tag || "none";
 
             let numContacts = contactManifold.getNumContacts();
     
@@ -103,15 +105,31 @@ export default class Physics {
                 node0.colliding = true;
                 node1.colliding = true;
 
-                if (tag0 == "bullet" && tag1 == "hittable") {
-                    node1.destroy()
-                    node0.getHit();
+                node0.hitIgnoreTags = node0.hitIgnoreTags || [];
+                node1.hitIgnoreTags = node1.hitIgnoreTags || [];
+
+                if (tag0 == "bullet") {
+                    console.log(tag1, node0.hitIgnoreTags);
+                    if (!node0.hitIgnoreTags.includes(tag1)) {
+                        node0.destroy();
+                    }
+
+                    if (tag1 == "hittable") {
+                        node1.getHit();
+                    }
                 }
 
-                if (tag0 == "hittable" && tag1 == "bullet") {
-                    node1.destroy()
-                    node0.getHit();
+                if (tag1 == "bullet") {
+                    console.log(tag0, node1.hitIgnoreTags);
+                    if (!node1.hitIgnoreTags.includes(tag0)) {
+                        node1.destroy();
+                    }
+
+                    if (tag0 == "hittable") {
+                        node0.getHit();
+                    }
                 }
+
     
             }
     
@@ -193,26 +211,37 @@ export default class Physics {
         node.body = body;
         body.node = node;
 
-        this.objects.push(node);
+        this.queue.push(node);
     }
 
     addNode(node) {
         if (node.dynamic !== null) {
             this.createBody(node);
+
+            // needed when adding prefabs;
+            node.physics = this;
         }
     }
 
     removeNode(node) {
+        // remove from dynamic world
+        if (node.body) {
+            this.dynamicsWorld.removeRigidBody(node.body);
+        }
+        
         const index = this.objects.indexOf(node);
         if (index >= 0) {
             this.objects.splice(index, 1);
-            node.parent = null;
+            node.physics = null;
         }
     }
 
     prepareWorld(scene) {
         for (const node of scene.nodes) {
             this.addNode(node);
+
+            // save for later
+            node.scene = scene;
         }
     }
 

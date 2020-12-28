@@ -8,26 +8,38 @@ export default class Bullet extends Node {
 
     constructor(options) {
         super(options);
-
-        this.mousemoveHandler = this.mousemoveHandler.bind(this);
-        this.keydownHandler = this.keydownHandler.bind(this);
-        this.keyupHandler = this.keyupHandler.bind(this);
-        this.keys = {};
+        // tag
+        this.tag = "bullet";
+        this.hitIgnoreTags = [];
 
         // movement
         this.velocity = [0, 0, 0];
-        this.r = [0, 0, 0];
-        this.acceleration = [0, 0, 0];
-        this.mouseSensitivity = 0.002;
-        this.maxSpeed = 6;
-        this.speed = 20;
-        this.friction = 0.2;
+        this.speed = 100;
 
-        this.canJump = true;
-        this.jumping = false;
-        this.jumpPower = 40;
-        this.jumpTime = .2;
-        this.jumpCooldown = .6;
+        this.physics = options.physics || null;
+        this.scene = options.scene || null;
+    }
+
+    fire(pos, q, direction, hitIgnoreTags) {
+        vec3.scale(this.velocity, direction, this.speed);
+        this.rotation = q;
+        this.translation = pos;
+        
+        // make it dynamic so that phsics picks it up
+        this.dynamic = 2;
+        this.hitIgnoreTags = hitIgnoreTags;
+
+        // add it to physics queue
+        console.log(this.scene);
+        this.scene.addNode(this);
+        this.physics.addNode(this);
+    }
+
+    clone() {
+        return new Bullet({
+            ...this,
+            children: this.children.map(child => child.clone()),
+        });
     }
 
 }

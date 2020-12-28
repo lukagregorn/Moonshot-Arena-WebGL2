@@ -1,5 +1,3 @@
-import Node from './Node.js';
-
 export default class Scene {
 
     constructor(options = {}) {
@@ -8,6 +6,14 @@ export default class Scene {
 
     addNode(node) {
         this.nodes.push(node);
+    }
+
+    removeNode(node) {
+        const index = this.nodes.indexOf(node);
+        if (index >= 0) {
+            this.nodes.splice(index, 1);
+            node.scene = null;
+        }
     }
 
     traverse(before, after) {

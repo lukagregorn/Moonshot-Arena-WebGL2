@@ -29,7 +29,8 @@ export default class Node {
         this.mesh = options.mesh || null;
 
         this.colliding = false;
-        
+        this.destroyed = false;
+
         if (options.extras) {
             this.dynamic = options.extras.dynamic; // 0 or 1   if null dont give it physics at all
         }
@@ -57,6 +58,17 @@ export default class Node {
             this.scale);
     }
 
+    getGlobalMatrix() {
+        const mat = mat4.clone(this.matrix);
+        let parent = this.parent;
+        while (parent) {
+            mat4.mul(mat, parent.matrix, mat);
+            parent = parent.parent;
+        }
+        
+        return mat;
+    }
+
     addChild(node) {
         this.children.push(node);
         node.parent = this;
@@ -75,6 +87,25 @@ export default class Node {
             ...this,
             children: this.children.map(child => child.clone()),
         });
+    }
+
+
+    destroy() {
+        if (this.scene) {
+            this.scene.removeNode(this);
+        }
+
+        if (this.physics) {
+            this.physics.removeNode(this);
+        }
+
+        if (this.parent) {
+            const index = this.parent.children.indexOf(this);
+            if (index >= 0) {
+                this.parent.children.splice(index, 1);
+                this.parent = null;
+            }
+        }
     }
 
 }
