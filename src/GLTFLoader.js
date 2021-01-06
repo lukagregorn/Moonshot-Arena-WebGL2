@@ -11,6 +11,7 @@ import Node from './Node.js';
 import Scene from './Scene.js';
 import Player from './Player.js';
 import Bullet from './Bullet.js';
+import Enemy from './Enemy.js';
 
 const vec3 = glMatrix.vec3;
 const vec4 = glMatrix.vec4;
@@ -301,6 +302,8 @@ export default class GLTFLoader {
         let node;
         if (gltfSpec.name == "Player") {
             node = new Player(options);
+        } else if (gltfSpec.name == "Enemy") {
+            node = new Enemy(options);
         } else if (gltfSpec.name == "Bullet") {
             node = new Bullet(options);
         } else {

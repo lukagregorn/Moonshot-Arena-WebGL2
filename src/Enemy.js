@@ -4,22 +4,22 @@ const mat4 = glMatrix.mat4;
 const vec3 = glMatrix.vec3;
 const quat = glMatrix.quat;
 
-export default class Player extends Node {
+export default class Enemy extends Node {
 
     constructor(options) {
         super(options);
 
-        this.mousemoveHandler = this.mousemoveHandler.bind(this);
-        this.keydownHandler = this.keydownHandler.bind(this);
-        this.keyupHandler = this.keyupHandler.bind(this);
         this.keys = {};
 
-        this.head = null;
         this.prefabs = null;
+        this.target = null;
+
+        // enemy
+        this.range = 60;
         
         // physics
         this.isHumanoid = true;
-        this.tag = "player";
+        this.tag = "enemy";
         this.hitIgnoreTags = [];
 
         // shooting
@@ -62,19 +62,7 @@ export default class Player extends Node {
         
         // 1: add movement acceleration
         let acc = c.acceleration;
-        if (this.keys['KeyW']) {
-            vec3.add(acc, acc, forward);
-        }
-        if (this.keys['KeyS']) {
-            vec3.sub(acc, acc, forward);
-        }
-        if (this.keys['KeyD']) {
-            vec3.add(acc, acc, right);
-        }
-        if (this.keys['KeyA']) {
-            vec3.sub(acc, acc, right);
-        }
-        
+                
         // Jump logic
         if (this.keys['Space']) {
             if (this.canJump) {
@@ -102,28 +90,13 @@ export default class Player extends Node {
             }
         }
         
-        
-        // 2: update velocity
-        vec3.scaleAndAdd(c.velocity, c.velocity, acc, dt * c.speed);
-
-        // 3: if no movement, apply friction
-        if (!this.keys['KeyW'] &&
-            !this.keys['KeyS'] &&
-            !this.keys['KeyD'] &&
-            !this.keys['KeyA'])
-        {
-            vec3.scale(c.velocity, c.velocity, 1 - c.friction);
-        }
-
-        // 4: limit speed
-        const len = vec3.len(c.velocity);
-        if (len > c.maxSpeed) {
-            vec3.scale(c.velocity, c.velocity, (c.maxSpeed-1) / len);
-        }
 
         // scale acceleration
         vec3.scale(acc, acc, dt * c.speed);
         
+        // rotate 
+        this.rotateTowardsTarget();
+
         // fire rate cooldown
         const fr = 0.5;
         if (!this.canFire) {
@@ -131,6 +104,10 @@ export default class Player extends Node {
             if (this.fireRate <= 0) {
                 this.canFire = true;
                 this.fireRate = fr;
+            }
+        } else {
+            if (this.targetInRange()) {
+                this.shoot();
             }
         }
     }
@@ -144,7 +121,7 @@ export default class Player extends Node {
         this.canFire = false;
 
         const pos = mat4.getTranslation(vec3.create(), this.shootPoint.getGlobalMatrix());
-        const q = mat4.getRotation(quat.create(), this.head.children[0].children[1].getGlobalMatrix());
+        const q = mat4.getRotation(quat.create(), this.getGlobalMatrix());
         const direction = [
             2 * (q[0] * q[2] + q[3] * q[1]),
             2 * (q[1] * q[2] - q[3] * q[0]),
@@ -154,69 +131,67 @@ export default class Player extends Node {
         vec3.negate(direction, direction);
 
         const bullet = this.prefabs.bullet.clone();
-        bullet.fire(pos, q, direction, ["player"]);
+        bullet.fire(pos, q, direction, ["enemy"]);
     }
 
-
-    enableMouseLock() {
-        document.addEventListener('mousemove', this.mousemoveHandler);
-        document.addEventListener('mousedown', this.shoot);
-        document.addEventListener('keydown', this.keydownHandler);
-        document.addEventListener('keyup', this.keyupHandler);
-    }
-
-    disableMouseLock() {
-        document.removeEventListener('mousemove', this.mousemoveHandler);
-        document.removeEventListener('mousedown', this.shoot);
-        document.removeEventListener('keydown', this.keydownHandler);
-        document.removeEventListener('keyup', this.keyupHandler);
-
-        for (let key in this.keys) {
-            this.keys[key] = false;
+    targetInRange() {
+        const target = this.target;
+        if (!target) {
+            return false;
         }
+
+        const direction = vec3.sub(vec3.create(), target.translation, this.translation);
+        const distance = vec3.length(direction);
+
+        return distance <= this.range;
     }
 
-    mousemoveHandler(e) {
-        const dx = e.movementX;
-        const dy = e.movementY;
-        const c = this;
 
-        c.r[0] -= dy * c.mouseSensitivity;
-        c.r[1] -= dx * c.mouseSensitivity;
+    rotateTowardsTarget() {
+        const c = this;
+        const target = this.target;
+
+        if (!target || !this.targetInRange()) {
+            return;
+        }
 
         const pi = Math.PI;
-        const twopi = pi * 2;
-        const halfpi = pi / 2;
+        const twopi = pi*2;
+        
+        const currentDir = [-Math.sin(c.r[1]), 0, -Math.cos(c.r[1])];  // forward trenutni
+        const desiredDir = vec3.sub(vec3.create(), target.translation, c.translation);  // forward zeljeni
+        desiredDir[1] = 0; // y bi dal proc ker kokr vidm topi ne merijo gor dol ampak sam levo desno
+        vec3.normalize(desiredDir, desiredDir);  // se normaliziramo
+        
+        const angle = vec3.angle(currentDir, desiredDir);  // dobimo kot med nasima vektorjema;
+        c.r[1] += angle;  // dodas kot y osi;
+        
+        // Ker nas angle ne zanima al se vrtimo v levo al desno bo vedno vrnu manjsi kot
+        // zato preverimo ce smo s tem da smo pristeli angle mogoce kot sam se povecali (tega nocemo)
+        // ce smo ga povecali potem ga zmanjsamo za 2x ker ocitno je angle vrnu kot v drugo stran
 
-        if (c.r[0] > halfpi) {
-            c.r[0] = halfpi;
-        }
-        if (c.r[0] < -halfpi) {
-            c.r[0] = -halfpi;
+        const newDir = [-Math.sin(c.r[1]), 0, -Math.cos(c.r[1])];
+        const newAngle = vec3.angle(newDir, desiredDir);
+        if (newAngle > angle) {
+            c.r[1] -= 2*angle;
         }
 
-        c.r[1] = ((c.r[1] % twopi) + twopi) % twopi;
+        c.r[1] = ((c.r[1] % twopi) + twopi) % twopi; // limit rotation so we dont go to inifity
+
+        //console.log("Angle: ", angle, "Rotation:", c.r);
 
         const degrees = c.r.map(x => x * 180 / pi);
-        quat.fromEuler(c.head.rotation, ...degrees)
+        quat.fromEuler(c.rotation, ...degrees)
 
-        // update camera node rotation
-        c.head.updateMatrix();
+        // update rotation
+        c.updateMatrix();
     }
 
 
-    keydownHandler(e) {
-        this.keys[e.code] = true;
-    }
-
-    keyupHandler(e) {
-        this.keys[e.code] = false;
-    }
-
-    init(head, shootPoint, prefabs) {
-        this.head = head;
+    init(target, shootPoint, prefabs) {
         this.shootPoint = shootPoint;
         this.prefabs = prefabs;
+        this.target = target;
     }
 
 }

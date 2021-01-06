@@ -18,6 +18,11 @@ class App extends Application {
         const head = await this.loader.loadNode('Head');
         const shootPoint = await this.loader.loadNode('ShootPoint');
 
+        this.enemies = [];
+        const enemy = await this.loader.loadNode('Enemy');
+        const enemyShootPoint = await this.loader.loadNode("EnemyShootPoint");
+        this.enemies.push(enemy);
+
 
         const prefabs = {
             bullet: await this.loader.loadNode('Bullet')
@@ -37,6 +42,11 @@ class App extends Application {
 
         // give player a camera reference
         this.player.init(head, shootPoint, prefabs);
+
+        // init enemies
+        for (const enemy of this.enemies) {
+            enemy.init(this.player, enemyShootPoint, prefabs);
+        }
 
         this.renderer = new Renderer(this.gl);
         this.renderer.prepareScene(this.scene);
@@ -80,6 +90,14 @@ class App extends Application {
 
         if (this.player) {
             this.player.update(dt);
+        }
+
+        if (this.enemies) {
+            for (const enemy of this.enemies) {
+                if (enemy) {
+                    enemy.update(dt);
+                }
+            }
         }
 
         if (this.physics) {
