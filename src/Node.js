@@ -99,6 +99,10 @@ export default class Node {
             this.physics.removeNode(this);
         }
 
+        for (const child of this.children) {
+            child.destroy();
+        }
+
         if (this.parent) {
             const index = this.parent.children.indexOf(this);
             if (index >= 0) {

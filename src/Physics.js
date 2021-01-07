@@ -109,24 +109,24 @@ export default class Physics {
                 node1.hitIgnoreTags = node1.hitIgnoreTags || [];
 
                 if (tag0 == "bullet") {
-                    console.log(tag1, node0.hitIgnoreTags);
+                    //console.log(tag1, node0.hitIgnoreTags);
                     if (!node0.hitIgnoreTags.includes(tag1)) {
+                        node0.onImpact(tag1);
                         node0.destroy();
-                    }
-
-                    if (tag1 == "hittable") {
-                        node1.getHit();
+                        if (tag1 == "player" || tag1 == "enemy") {
+                            node1.takeHit();
+                        }
                     }
                 }
 
                 if (tag1 == "bullet") {
-                    console.log(tag0, node1.hitIgnoreTags);
+                    //console.log(tag0, node1.hitIgnoreTags);
                     if (!node1.hitIgnoreTags.includes(tag0)) {
+                        node1.onImpact(tag0);
                         node1.destroy();
-                    }
-
-                    if (tag0 == "hittable") {
-                        node0.getHit();
+                        if (tag0 == "player" || tag0 == "enemy") {
+                            node0.takeHit();
+                        }
                     }
                 }
 

@@ -227,7 +227,7 @@
             ],
             "translation" : [
                 0,
-                -3.0537285804748535,
+                -4.5643510818481445,
                 0
             ]
         },
@@ -1006,7 +1006,7 @@
             ],
             "translation" : [
                 -34.67804718017578,
-                0.5686721801757812,
+                0.5686759948730469,
                 -0.02080535888671875
             ]
         },
@@ -1049,7 +1049,7 @@
             ],
             "translation" : [
                 6,
-                7,
+                -4,
                 0
             ]
         },
@@ -1986,7 +1986,7 @@
             "extras" : {
                 "dynamic" : 0
             },
-            "name" : "Material.001",
+            "name" : "Enemy",
             "pbrMetallicRoughness" : {
                 "baseColorTexture" : {
                     "index" : 42,
@@ -2001,7 +2001,7 @@
             "extras" : {
                 "dynamic" : 0
             },
-            "name" : "Material.002",
+            "name" : "Material.001",
             "pbrMetallicRoughness" : {
                 "baseColorTexture" : {
                     "index" : 43,
@@ -2016,7 +2016,7 @@
             "extras" : {
                 "dynamic" : 0
             },
-            "name" : "Material.003",
+            "name" : "Material.002",
             "pbrMetallicRoughness" : {
                 "baseColorTexture" : {
                     "index" : 44,
@@ -2031,7 +2031,7 @@
             "extras" : {
                 "dynamic" : 0
             },
-            "name" : "Material.005",
+            "name" : "Material.003",
             "pbrMetallicRoughness" : {
                 "baseColorTexture" : {
                     "index" : 45,
@@ -2046,7 +2046,7 @@
             "extras" : {
                 "dynamic" : 0
             },
-            "name" : "Material.006",
+            "name" : "Material.005",
             "pbrMetallicRoughness" : {
                 "baseColorTexture" : {
                     "index" : 46,
@@ -2061,7 +2061,7 @@
             "extras" : {
                 "dynamic" : 0
             },
-            "name" : "Material.011",
+            "name" : "Material.006",
             "pbrMetallicRoughness" : {
                 "baseColorTexture" : {
                     "index" : 47,
@@ -2076,7 +2076,7 @@
             "extras" : {
                 "dynamic" : 0
             },
-            "name" : "Material.013",
+            "name" : "Material.011",
             "pbrMetallicRoughness" : {
                 "baseColorTexture" : {
                     "index" : 48,
@@ -2091,7 +2091,7 @@
             "extras" : {
                 "dynamic" : 0
             },
-            "name" : "Material.012",
+            "name" : "Material.013",
             "pbrMetallicRoughness" : {
                 "baseColorTexture" : {
                     "index" : 49,
@@ -2106,7 +2106,7 @@
             "extras" : {
                 "dynamic" : 0
             },
-            "name" : "Material.015",
+            "name" : "Material.012",
             "pbrMetallicRoughness" : {
                 "baseColorTexture" : {
                     "index" : 50,
@@ -2121,7 +2121,7 @@
             "extras" : {
                 "dynamic" : 0
             },
-            "name" : "Material.014",
+            "name" : "Material.015",
             "pbrMetallicRoughness" : {
                 "baseColorTexture" : {
                     "index" : 51,
@@ -2136,7 +2136,7 @@
             "extras" : {
                 "dynamic" : 0
             },
-            "name" : "Material.054",
+            "name" : "Material.014",
             "pbrMetallicRoughness" : {
                 "baseColorTexture" : {
                     "index" : 52,
@@ -2151,7 +2151,7 @@
             "extras" : {
                 "dynamic" : 0
             },
-            "name" : "Material.053",
+            "name" : "Material.054",
             "pbrMetallicRoughness" : {
                 "baseColorTexture" : {
                     "index" : 53,
@@ -2166,7 +2166,7 @@
             "extras" : {
                 "dynamic" : 0
             },
-            "name" : "Material.052",
+            "name" : "Material.053",
             "pbrMetallicRoughness" : {
                 "baseColorTexture" : {
                     "index" : 54,
@@ -2181,7 +2181,7 @@
             "extras" : {
                 "dynamic" : 0
             },
-            "name" : "Material.051",
+            "name" : "Material.052",
             "pbrMetallicRoughness" : {
                 "baseColorTexture" : {
                     "index" : 55,
@@ -2196,7 +2196,7 @@
             "extras" : {
                 "dynamic" : 0
             },
-            "name" : "Material.056",
+            "name" : "Material.051",
             "pbrMetallicRoughness" : {
                 "baseColorTexture" : {
                     "index" : 56,
@@ -2211,10 +2211,25 @@
             "extras" : {
                 "dynamic" : 0
             },
-            "name" : "Material.057",
+            "name" : "Material.056",
             "pbrMetallicRoughness" : {
                 "baseColorTexture" : {
                     "index" : 57,
+                    "texCoord" : 0
+                },
+                "metallicFactor" : 0,
+                "roughnessFactor" : 0.4000000059604645
+            }
+        },
+        {
+            "doubleSided" : true,
+            "extras" : {
+                "dynamic" : 0
+            },
+            "name" : "Material.057",
+            "pbrMetallicRoughness" : {
+                "baseColorTexture" : {
+                    "index" : 58,
                     "texCoord" : 0
                 },
                 "metallicFactor" : 0,
@@ -2863,7 +2878,7 @@
                         "TEXCOORD_0" : 140
                     },
                     "indices" : 7,
-                    "material" : 0
+                    "material" : 42
                 }
             ]
         },
@@ -2877,7 +2892,7 @@
                         "TEXCOORD_0" : 143
                     },
                     "indices" : 7,
-                    "material" : 42
+                    "material" : 43
                 }
             ]
         },
@@ -2891,7 +2906,7 @@
                         "TEXCOORD_0" : 146
                     },
                     "indices" : 7,
-                    "material" : 43
+                    "material" : 44
                 }
             ]
         },
@@ -2905,7 +2920,7 @@
                         "TEXCOORD_0" : 149
                     },
                     "indices" : 7,
-                    "material" : 44
+                    "material" : 45
                 }
             ]
         },
@@ -2919,7 +2934,7 @@
                         "TEXCOORD_0" : 152
                     },
                     "indices" : 7,
-                    "material" : 45
+                    "material" : 46
                 }
             ]
         },
@@ -2933,7 +2948,7 @@
                         "TEXCOORD_0" : 155
                     },
                     "indices" : 7,
-                    "material" : 46
+                    "material" : 47
                 }
             ]
         },
@@ -2947,7 +2962,7 @@
                         "TEXCOORD_0" : 158
                     },
                     "indices" : 7,
-                    "material" : 47
+                    "material" : 48
                 }
             ]
         },
@@ -2961,7 +2976,7 @@
                         "TEXCOORD_0" : 161
                     },
                     "indices" : 7,
-                    "material" : 48
+                    "material" : 49
                 }
             ]
         },
@@ -2975,7 +2990,7 @@
                         "TEXCOORD_0" : 164
                     },
                     "indices" : 7,
-                    "material" : 49
+                    "material" : 50
                 }
             ]
         },
@@ -2989,7 +3004,7 @@
                         "TEXCOORD_0" : 167
                     },
                     "indices" : 7,
-                    "material" : 50
+                    "material" : 51
                 }
             ]
         },
@@ -3003,7 +3018,7 @@
                         "TEXCOORD_0" : 170
                     },
                     "indices" : 7,
-                    "material" : 51
+                    "material" : 52
                 }
             ]
         },
@@ -3017,7 +3032,7 @@
                         "TEXCOORD_0" : 173
                     },
                     "indices" : 7,
-                    "material" : 52
+                    "material" : 53
                 }
             ]
         },
@@ -3031,7 +3046,7 @@
                         "TEXCOORD_0" : 176
                     },
                     "indices" : 7,
-                    "material" : 53
+                    "material" : 54
                 }
             ]
         },
@@ -3045,7 +3060,7 @@
                         "TEXCOORD_0" : 179
                     },
                     "indices" : 7,
-                    "material" : 54
+                    "material" : 55
                 }
             ]
         },
@@ -3059,7 +3074,7 @@
                         "TEXCOORD_0" : 182
                     },
                     "indices" : 7,
-                    "material" : 55
+                    "material" : 56
                 }
             ]
         },
@@ -3073,7 +3088,7 @@
                         "TEXCOORD_0" : 185
                     },
                     "indices" : 7,
-                    "material" : 56
+                    "material" : 57
                 }
             ]
         },
@@ -3087,7 +3102,7 @@
                         "TEXCOORD_0" : 188
                     },
                     "indices" : 7,
-                    "material" : 57
+                    "material" : 58
                 }
             ]
         }
@@ -3263,6 +3278,10 @@
         },
         {
             "sampler" : 0,
+            "source" : 2
+        },
+        {
+            "sampler" : 0,
             "source" : 1
         },
         {
@@ -3336,6 +3355,11 @@
             "mimeType" : "image/png",
             "name" : "mainTexture.png",
             "uri" : "mainTexture_png.png"
+        },
+        {
+            "mimeType" : "image/png",
+            "name" : "enemyTexture",
+            "uri" : "enemyTexture.png"
         }
     ],
     "accessors" : [

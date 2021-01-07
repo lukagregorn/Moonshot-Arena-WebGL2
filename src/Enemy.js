@@ -4,6 +4,10 @@ const mat4 = glMatrix.mat4;
 const vec3 = glMatrix.vec3;
 const quat = glMatrix.quat;
 
+function clamp(num, min, max) {
+    return num <= min ? min : num >= max ? max : num;
+}
+
 export default class Enemy extends Node {
 
     constructor(options) {
@@ -14,8 +18,12 @@ export default class Enemy extends Node {
         this.prefabs = null;
         this.target = null;
 
+        this.physics = options.physics || null;
+        this.scene = options.scene || null;
+
         // enemy
-        this.range = 60;
+        this.shootRange = 50;
+        this.walkRange = 90;
         
         // physics
         this.isHumanoid = true;
@@ -34,7 +42,7 @@ export default class Enemy extends Node {
         this.jumpForce = [0,0,0];
         this.mouseSensitivity = 0.002;
         this.maxSpeed = 10;
-        this.speed = 15;
+        this.speed = 12;
         this.friction = 0.2;
 
         this.canJump = true;
@@ -46,56 +54,11 @@ export default class Enemy extends Node {
 
 
     update(dt) {
-        const c = this;
-        const jt = 0.11;
-        const jc = 2.2;
-        
-        c.acceleration = vec3.create();
-        
-        const forward = vec3.set(vec3.create(),
-        -Math.sin(c.r[1]), 0, -Math.cos(c.r[1]));
-        
-        const right = vec3.set(vec3.create(),
-        Math.cos(c.r[1]), 0, -Math.sin(c.r[1]));
-        
-        const up = vec3.set(vec3.create(), 0, 1, 0);
-        
-        // 1: add movement acceleration
-        let acc = c.acceleration;
-                
-        // Jump logic
-        if (this.keys['Space']) {
-            if (this.canJump) {
-                this.jumping = true;
-                this.canJump = false;
-            }
-        }
-
-        if (this.jumping) {
-            this.jumpTime -= dt;
-            if (this.jumpTime <= 0) {
-                this.jumpTime = jt;
-                this.jumping = false;
-            } else {
-                this.jumpForce = vec3.scale(vec3.create(), up, c.jumpPower * c.jumpTime);
-            }
-        } else {
-            this.jumpForce = [0,0,0];
-            if (!this.canJump) {
-                this.jumpCooldown -= dt;
-                if (this.jumpCooldown <= 0) {
-                    this.jumpCooldown = jc;
-                    this.canJump = true;
-                }
-            }
-        }
-        
-
-        // scale acceleration
-        vec3.scale(acc, acc, dt * c.speed);
-        
         // rotate 
         this.rotateTowardsTarget();
+
+        // follow player
+        this.followTarget(dt);
 
         // fire rate cooldown
         const fr = 0.5;
@@ -106,12 +69,20 @@ export default class Enemy extends Node {
                 this.fireRate = fr;
             }
         } else {
-            if (this.targetInRange()) {
+            if (this.targetInShootRange()) {
                 this.shoot();
             }
         }
     }
     
+    getSoundVolume() {
+        const distance = this.getDistanceFromTarget();
+        if (distance > -1) {
+            return clamp(1 - (distance / (this.shootRange + 5)), 0, 1);;
+        }
+
+        return 0;
+    }
     
     shoot() {
         if ((!this.prefabs && this.prefabs.bullet) || !this.canFire) {
@@ -129,21 +100,85 @@ export default class Enemy extends Node {
         ];
 
         vec3.negate(direction, direction);
+        
+        // sfx
+        const gunshot = new Audio("../assets/sfx/EnemyGunShot.wav"); 
+        gunshot.preload = 'auto'; 
+        gunshot.volume = this.getSoundVolume();
+        gunshot.play();
 
-        const bullet = this.prefabs.bullet.clone();
+        const bullet = this.prefabs.bullet.clone(this.target);
         bullet.fire(pos, q, direction, ["enemy"]);
     }
 
-    targetInRange() {
+    takeHit() {
+        if (this.dead) {
+            return;
+        }
+
+        this.dead = true;
+
+        // play sound fx
+        const hitEnemy = new Audio("../assets/sfx/BulletHitEnemy.wav"); 
+        hitEnemy.preload = 'auto'; 
+        hitEnemy.volume = 1;
+        hitEnemy.play();
+
+        const index = this.enemies.indexOf(this);
+        if (index >= 0) {
+            this.enemies.splice(index, 1);
+            this.enemies = null;
+        }
+
+        this.destroy();
+    }
+
+    getDistanceFromTarget() {
         const target = this.target;
         if (!target) {
-            return false;
+            return -1;
         }
 
         const direction = vec3.sub(vec3.create(), target.translation, this.translation);
-        const distance = vec3.length(direction);
+        return vec3.length(direction);
+    }
 
-        return distance <= this.range;
+    targetInShootRange() {
+        const distance = this.getDistanceFromTarget();
+        if (distance > -1) {
+            return distance <= this.shootRange;
+        }
+
+        return false;
+    }
+
+
+    targetInWalkRange() {
+        const distance = this.getDistanceFromTarget();
+        if (distance > -1) {
+            return distance <= this.walkRange;
+        }
+
+        return false;
+    }
+
+    followTarget(dt) {
+        const c = this;
+        const target = this.target;
+
+        if (!target || !this.targetInWalkRange()) {
+            return;
+        }
+
+        c.acceleration = vec3.create();
+        
+        const forward = vec3.set(vec3.create(),
+        -Math.sin(c.r[1]), 0, -Math.cos(c.r[1]));
+
+        let acc = c.acceleration;
+
+        vec3.add(acc, acc, forward);
+        vec3.scale(acc, acc, dt * c.speed);
     }
 
 
@@ -151,7 +186,7 @@ export default class Enemy extends Node {
         const c = this;
         const target = this.target;
 
-        if (!target || !this.targetInRange()) {
+        if (!target || !this.targetInWalkRange()) {
             return;
         }
 
@@ -188,10 +223,28 @@ export default class Enemy extends Node {
     }
 
 
-    init(target, shootPoint, prefabs) {
-        this.shootPoint = shootPoint;
+    init(target, prefabs, spawnpoint, enemies) {
+        this.shootPoint = this.children[0].children[0];
         this.prefabs = prefabs;
         this.target = target;
+        this.enemies = enemies;
+
+        this.dynamic = 1;
+
+        this.translation = spawnpoint;
+        this.updateMatrix();
+
+        this.scene.addNode(this);
+        this.physics.addNode(this);
+
+        this.enemies.push(this);
+    }
+
+    clone() {
+        return new Enemy({
+            ...this,
+            children: this.children.map(child => child.clone()),
+        });
     }
 
 }

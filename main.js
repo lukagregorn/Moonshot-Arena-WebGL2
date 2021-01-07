@@ -3,6 +3,7 @@ import * as WebGL from './src/WebGL.js';
 import GLTFLoader from './src/GLTFLoader.js';
 import Renderer from './src/Renderer.js';
 import Physics from './src/Physics.js';
+import Light from './src/Light.js';
 
 const mat4 = glMatrix.mat4;
 
@@ -18,13 +19,10 @@ class App extends Application {
         const head = await this.loader.loadNode('Head');
         const shootPoint = await this.loader.loadNode('ShootPoint');
 
+        this.enemy = await this.loader.loadNode('Enemy');
         this.enemies = [];
-        const enemy = await this.loader.loadNode('Enemy');
-        const enemyShootPoint = await this.loader.loadNode("EnemyShootPoint");
-        this.enemies.push(enemy);
 
-
-        const prefabs = {
+        this.prefabs = {
             bullet: await this.loader.loadNode('Bullet')
         }
         
@@ -36,17 +34,16 @@ class App extends Application {
             throw new Error('Camera node does not contain a camera reference');
         }
 
-        if (!prefabs.bullet) {
+        if (!this.prefabs.bullet) {
             throw new Error('Where is my bullet :/');
         }
 
         // give player a camera reference
-        this.player.init(head, shootPoint, prefabs);
+        this.player.init(head, shootPoint, this.prefabs);
 
-        // init enemies
-        for (const enemy of this.enemies) {
-            enemy.init(this.player, enemyShootPoint, prefabs);
-        }
+        // make light
+        this.light = new Light();
+        this.scene.addNode(this.light);
 
         this.renderer = new Renderer(this.gl);
         this.renderer.prepareScene(this.scene);
@@ -69,6 +66,11 @@ class App extends Application {
 
     enableCamera() {
         this.canvas.requestPointerLock();
+    }
+
+    cloneEnemy() {
+        const enemyClone = this.enemy.clone();
+        enemyClone.init(this.player, this.prefabs, [-30, 6, 0], this.enemies);
     }
 
     pointerlockchangeHandler() {
@@ -109,7 +111,7 @@ class App extends Application {
 
     render() {
         if (this.renderer) {
-            this.renderer.render(this.scene, this.camera);
+            this.renderer.render(this.scene, this.camera, this.light);
         }
     }
 
@@ -131,4 +133,5 @@ document.addEventListener('DOMContentLoaded', () => {
     const app = new App(canvas);
     const gui = new dat.GUI();
     gui.add(app, 'enableCamera');
+    gui.add(app, 'cloneEnemy');
 });

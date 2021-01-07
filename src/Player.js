@@ -3,7 +3,6 @@ import Node from './Node.js';
 const mat4 = glMatrix.mat4;
 const vec3 = glMatrix.vec3;
 const quat = glMatrix.quat;
-
 export default class Player extends Node {
 
     constructor(options) {
@@ -17,6 +16,12 @@ export default class Player extends Node {
         this.head = null;
         this.prefabs = null;
         
+        // human
+        this.health = 5;
+        this.maxHealth = 5;
+        this.isHit = false;
+        this.isHitCooldown = 0.2;
+
         // physics
         this.isHumanoid = true;
         this.tag = "player";
@@ -41,7 +46,12 @@ export default class Player extends Node {
         this.jumping = false;
         this.jumpPower = 50;
         this.jumpTime = .11;
-        this.jumpCooldown = 2.2;
+        this.jumpCooldown = 2.2;   
+
+        // sfx
+        this.takeHitSFX = new Audio("../assets/sfx/PlayerTakeHit.wav"); 
+        this.takeHitSFX.preload = 'auto';
+        
     }
 
 
@@ -133,8 +143,33 @@ export default class Player extends Node {
                 this.fireRate = fr;
             }
         }
+
+        // ishit cooldown
+        const hc = 0.2;
+        if (this.isHit) {
+            this.isHitCooldown -= dt;
+            if (this.isHitCooldown <= 0) {
+                this.isHit = false;
+                this.isHitCooldown = hc;
+            }
+        }
     }
     
+
+    takeHit() {
+        if (this.isHit) {
+            return;
+        }
+
+        this.isHit = true;
+        this.health -= 1;
+        if (this.health <= 0) {
+            this.died();
+        }
+
+        // play sound fx
+        this.takeHitSFX.play();
+    }
     
     shoot() {
         if ((!this.prefabs && this.prefabs.bullet) || !this.canFire) {
@@ -153,10 +188,20 @@ export default class Player extends Node {
 
         vec3.negate(direction, direction);
 
-        const bullet = this.prefabs.bullet.clone();
+        // sfx
+        const gunshot = new Audio("../assets/sfx/GunShot.wav"); 
+        gunshot.preload = 'auto'; 
+        gunshot.volume = 1;
+        gunshot.play();
+
+        const bullet = this.prefabs.bullet.clone(this);
         bullet.fire(pos, q, direction, ["player"]);
     }
 
+
+    died() {
+        console.log("Player died what do i do");
+    }
 
     enableMouseLock() {
         document.addEventListener('mousemove', this.mousemoveHandler);
