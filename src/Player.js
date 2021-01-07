@@ -76,6 +76,11 @@ export default class Player extends Node {
         }
     }
 
+    heal() {
+        this.health = this.maxHealth;
+        this.updateLives();
+    }
+
 
     update(dt) {
         const c = this;

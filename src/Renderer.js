@@ -14,7 +14,7 @@ export default class Renderer {
         this.glObjects = new Map();
         this.programs = WebGL.buildPrograms(gl, shaders);
 
-        gl.clearColor(1, 1, 0.8, 1);
+        gl.clearColor(0.133, 0.176, 0.247, 1);
         gl.enable(gl.DEPTH_TEST);
         gl.enable(gl.CULL_FACE);
     }

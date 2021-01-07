@@ -22,8 +22,8 @@ export default class Enemy extends Node {
         this.scene = options.scene || null;
 
         // enemy
-        this.shootRange = 50;
-        this.walkRange = 90;
+        this.shootRange = 70;
+        this.walkRange = 150;
         
         // physics
         this.isHumanoid = true;
@@ -218,7 +218,7 @@ export default class Enemy extends Node {
 
 
     init(target, prefabs, spawnpoint, roundManager) {
-        this.shootPoint = this.children[0].children[0];
+        this.shootPoint = this.children[2].children[0];
         this.prefabs = prefabs;
         this.target = target;
         this.roundManager = roundManager;

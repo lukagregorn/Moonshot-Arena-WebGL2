@@ -98,6 +98,9 @@ export default class RoundManager {
     roundFinished() {
         this.roundInProgress = false;
         this.roundNumberUI.nodeValue = "ROUND FINISHED";
+        this.enemiesLeftUI.nodeValue = "LIFE RESTORED";
+
+        this.player.heal();
     }
 
     startRound() {
