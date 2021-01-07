@@ -4,6 +4,7 @@ import GLTFLoader from './src/GLTFLoader.js';
 import Renderer from './src/Renderer.js';
 import Physics from './src/Physics.js';
 import Light from './src/Light.js';
+import RoundManager from './src/RoundManager.js';
 
 const mat4 = glMatrix.mat4;
 
@@ -14,17 +15,15 @@ class App extends Application {
         await this.loader.load('./assets/main_scene/main_scene.gltf');
 
         this.scene = await this.loader.loadScene(this.loader.defaultScene);
-        this.spawnpoints = await this.loader.loadNode("Spawnpoints");
         this.camera = await this.loader.loadNode('Camera_Orientation');
         this.player = await this.loader.loadNode('Player');
         const head = await this.loader.loadNode('Head');
         const shootPoint = await this.loader.loadNode('ShootPoint');
-
-        this.enemy = await this.loader.loadNode('Enemy');
-        this.enemies = [];
+        const spawnpoints = await this.loader.loadNode('Spawnpoints');
 
         this.prefabs = {
-            bullet: await this.loader.loadNode('Bullet')
+            bullet: await this.loader.loadNode('Bullet'),
+            enemy: await this.loader.loadNode('Enemy')
         }
 
                
@@ -53,7 +52,6 @@ class App extends Application {
         this.physics = new Physics();
         await this.physics.init();
         this.physics.loaded = true;
-        //console.log(this.physics);
         this.physics.prepareWorld(this.scene);
 
         this.time = Date.now();
@@ -63,21 +61,45 @@ class App extends Application {
         this.pointerlockchangeHandler = this.pointerlockchangeHandler.bind(this);
         document.addEventListener('pointerlockchange', this.pointerlockchangeHandler);
 
+        this.initUI();
         this.resize();
+        
+        this.playerDiedCallback = this.playerDiedCallback.bind(this);
+        this.roundManager = new RoundManager(this.player, this.prefabs, spawnpoints, this.playerDiedCallback);
     }
 
-    enableCamera() {
+    initUI() {
+        this.gameplayUI = document.querySelector('#gameplay-overlay');
+        this.titleUI = document.querySelector('#title-overlay');
+
+        this.playButton = document.querySelector('#play');
+
+        this.play = this.play.bind(this);
+        this.playButton.addEventListener('click', this.play);
+
+        this.gameplayUI.addEventListener('mousedown', (e) => {
+            this.canvas.requestPointerLock();
+        })
+    }
+
+    play() {
+        console.log("this fired");
+        this.titleUI.style.display = "none";
+        this.gameplayUI.style.display = "block";
+
         this.canvas.requestPointerLock();
-    }
-    
-    getSpawnpoint() {
-        return this.spawnpoints.children[Math.floor(Math.random() * this.spawnpoints.children.length)];
+        this.roundManager.setPlaying(true);
     }
 
-    cloneEnemy() {
-        const enemyClone = this.enemy.clone();
-        const spawnpoint = this.getSpawnpoint()
-        enemyClone.init(this.player, this.prefabs, spawnpoint.translation, this.enemies);
+    playerDiedCallback() {
+        document.exitPointerLock();
+
+        this.physics.setBodyPosition(this.player.body, this.player.spawnpoint);
+        this.physics.updateNodePosition(this.player);
+        this.player.updateMatrix();
+
+        this.gameplayUI.style.display = "none";
+        this.titleUI.style.display = "block";
     }
 
     pointerlockchangeHandler() {
@@ -97,23 +119,20 @@ class App extends Application {
         const dt = (this.time - this.startTime) * 0.001;
         this.startTime = this.time;
 
-        if (this.player) {
-            this.player.update(dt);
-        }
-
-        if (this.enemies) {
-            for (const enemy of this.enemies) {
-                if (enemy) {
-                    enemy.update(dt);
-                }
+        if (this.roundManager) {
+            if (!this.roundManager.playing) {
+                return;
             }
+            this.roundManager.update(dt);
         }
-
+        
         if (this.physics) {
             if (this.physics.loaded) {
                 this.physics.update(dt);
             }
         }
+
+        
     }
 
     render() {
@@ -138,7 +157,4 @@ class App extends Application {
 document.addEventListener('DOMContentLoaded', () => {
     const canvas = document.querySelector('canvas');
     const app = new App(canvas);
-    const gui = new dat.GUI();
-    gui.add(app, 'enableCamera');
-    gui.add(app, 'cloneEnemy');
 });

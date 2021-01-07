@@ -21,6 +21,8 @@ export default class Player extends Node {
         this.maxHealth = 5;
         this.isHit = false;
         this.isHitCooldown = 0.2;
+        this.spawnpoint = vec3.copy(vec3.create(), this.translation);
+        this.dead = false;
 
         // physics
         this.isHumanoid = true;
@@ -51,7 +53,27 @@ export default class Player extends Node {
         // sfx
         this.takeHitSFX = new Audio("../assets/sfx/PlayerTakeHit.wav"); 
         this.takeHitSFX.preload = 'auto';
+
+        // ui
+        this.lives = [
+            document.querySelector('#life1'),
+            document.querySelector('#life2'),
+            document.querySelector('#life3'),
+            document.querySelector('#life4'),
+            document.querySelector('#life5')
+        ];
         
+    }
+
+
+    updateLives() {
+        for (let i = 0; i < this.lives.length; i++) {
+            if (i < this.health) {
+                this.lives[i].src = "../assets/ui/dotGreen.png";
+            } else {
+                this.lives[i].src = "../assets/ui/dotWhite.png";
+            }
+        }
     }
 
 
@@ -169,6 +191,9 @@ export default class Player extends Node {
 
         // play sound fx
         this.takeHitSFX.play();
+
+        // update health ui
+        this.updateLives()
     }
     
     shoot() {
@@ -200,7 +225,19 @@ export default class Player extends Node {
 
 
     died() {
-        console.log("Player died what do i do");
+        this.dead = true;
+    }
+
+    respawn() {
+        this.health = this.maxHealth;
+        this.dead = false;
+
+        this.rotation = [0,0,0,1];
+        this.r = [0,0,0];
+        this.acceleration = [0, 0, 0];
+        this.jumpForce = [0,0,0];
+
+        this.updateLives();
     }
 
     enableMouseLock() {
@@ -262,6 +299,8 @@ export default class Player extends Node {
         this.head = head;
         this.shootPoint = shootPoint;
         this.prefabs = prefabs;
+
+        this.updateLives()
     }
 
 }

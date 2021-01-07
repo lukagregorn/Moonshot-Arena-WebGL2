@@ -13,7 +13,36 @@
 </head>
 <body>
     <div class="fullscreen">
-        <canvas></canvas>
+        <div id="gameplay-overlay">
+            <img src="./assets/ui/crossair_black.png" alt="crosshair" id="crosshair">
+
+            <div id="health">
+                <img src="./assets/ui/dotWhite.png" alt="health" id="life1">
+                <img src="./assets/ui/dotWhite.png" alt="health" id="life2">
+                <img src="./assets/ui/dotWhite.png" alt="health" id="life3">
+                <img src="./assets/ui/dotWhite.png" alt="health" id="life4">
+                <img src="./assets/ui/dotWhite.png" alt="health" id="life5">
+            </div>
+
+            <div id="round-info">
+                <span class="game-text" id="round-number"></span> <br>
+                <span class="game-text" id="enemies-left"></span>
+            </div>
+        </div>
+
+        <div id="title-overlay">
+            <img src="./assets/ui/TitleText.png" alt="title" id="title-text">
+            <button class="game-text" id="play">PLAY</button>
+            <div class="small-text" id="controls">
+                <p>
+                    Fight waves of enemies and try to survive.
+                </p>
+                <span>Movement: <b>WASD</b></span> <br>
+                <span>Shoot: <b>LMB</b></span> <br>
+            </div>
+        </div>
+        <canvas></canvas>        
     </div>
+
 </body>
 </html>

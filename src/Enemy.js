@@ -123,13 +123,8 @@ export default class Enemy extends Node {
         hitEnemy.volume = 1;
         hitEnemy.play();
 
-        const index = this.enemies.indexOf(this);
-        if (index >= 0) {
-            this.enemies.splice(index, 1);
-            this.enemies = null;
-        }
-
-        this.destroy();
+        // die
+        this.roundManager.enemyDied(this);
     }
 
     getDistanceFromTarget() {
@@ -222,11 +217,11 @@ export default class Enemy extends Node {
     }
 
 
-    init(target, prefabs, spawnpoint, enemies) {
+    init(target, prefabs, spawnpoint, roundManager) {
         this.shootPoint = this.children[0].children[0];
         this.prefabs = prefabs;
         this.target = target;
-        this.enemies = enemies;
+        this.roundManager = roundManager;
 
         this.dynamic = 1;
 
@@ -236,7 +231,6 @@ export default class Enemy extends Node {
         this.scene.addNode(this);
         this.physics.addNode(this);
 
-        this.enemies.push(this);
     }
 
     clone() {
