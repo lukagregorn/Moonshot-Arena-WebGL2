@@ -1,4 +1,5 @@
 # Moonshot Arena
+![alt text](./assets/ui/TitleText.png?raw=true)
 University project made with WebGL2. Goal of the game is to survive as many rounds of enemies as you can.
 
 ## Building and running
