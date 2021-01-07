@@ -89,17 +89,16 @@ export default class Enemy extends Node {
             return;
         }
 
+        if (!this.target) {
+            return;
+        }
+
         this.canFire = false;
 
         const pos = mat4.getTranslation(vec3.create(), this.shootPoint.getGlobalMatrix());
         const q = mat4.getRotation(quat.create(), this.getGlobalMatrix());
-        const direction = [
-            2 * (q[0] * q[2] + q[3] * q[1]),
-            2 * (q[1] * q[2] - q[3] * q[0]),
-            1 - 2 * (q[0] * q[0] + q[1] * q[1])
-        ];
-
-        vec3.negate(direction, direction);
+        const direction = vec3.sub(vec3.create(), this.target.translation, pos);
+        vec3.normalize(direction, direction);
         
         // sfx
         const gunshot = new Audio("../assets/sfx/EnemyGunShot.wav"); 

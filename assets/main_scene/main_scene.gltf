@@ -78,7 +78,8 @@
                 63,
                 64,
                 65,
-                66
+                66,
+                76
             ]
         }
     ],
@@ -1336,6 +1337,119 @@
                 3,
                 0
             ]
+        },
+        {
+            "extras" : {
+                "spawnpoint" : 0
+            },
+            "name" : "Spawnpoint.001",
+            "translation" : [
+                -20,
+                5,
+                -37
+            ]
+        },
+        {
+            "extras" : {
+                "spawnpoint" : 0
+            },
+            "name" : "Spawnpoint.002",
+            "translation" : [
+                20,
+                5,
+                -37
+            ]
+        },
+        {
+            "extras" : {
+                "spawnpoint" : 0
+            },
+            "name" : "Spawnpoint.003",
+            "translation" : [
+                20,
+                5,
+                37
+            ]
+        },
+        {
+            "extras" : {
+                "spawnpoint" : 0
+            },
+            "name" : "Spawnpoint.004",
+            "translation" : [
+                -20,
+                5,
+                37
+            ]
+        },
+        {
+            "extras" : {
+                "spawnpoint" : 0
+            },
+            "name" : "Spawnpoint.005",
+            "translation" : [
+                -52,
+                15,
+                0
+            ]
+        },
+        {
+            "extras" : {
+                "spawnpoint" : 0
+            },
+            "name" : "Spawnpoint.006",
+            "translation" : [
+                93,
+                8,
+                0
+            ]
+        },
+        {
+            "extras" : {
+                "spawnpoint" : 0
+            },
+            "name" : "Spawnpoint.007",
+            "translation" : [
+                0,
+                8,
+                -65
+            ]
+        },
+        {
+            "extras" : {
+                "spawnpoint" : 0
+            },
+            "name" : "Spawnpoint.008",
+            "translation" : [
+                0,
+                8,
+                65
+            ]
+        },
+        {
+            "extras" : {
+                "spawnpoint" : 0
+            },
+            "name" : "Spawnpoint.009",
+            "translation" : [
+                -33,
+                5,
+                0
+            ]
+        },
+        {
+            "children" : [
+                67,
+                68,
+                69,
+                70,
+                71,
+                72,
+                73,
+                74,
+                75
+            ],
+            "name" : "Spawnpoints"
         }
     ],
     "cameras" : [

@@ -14,6 +14,7 @@ class App extends Application {
         await this.loader.load('./assets/main_scene/main_scene.gltf');
 
         this.scene = await this.loader.loadScene(this.loader.defaultScene);
+        this.spawnpoints = await this.loader.loadNode("Spawnpoints");
         this.camera = await this.loader.loadNode('Camera_Orientation');
         this.player = await this.loader.loadNode('Player');
         const head = await this.loader.loadNode('Head');
@@ -25,7 +26,8 @@ class App extends Application {
         this.prefabs = {
             bullet: await this.loader.loadNode('Bullet')
         }
-        
+
+               
         if (!this.scene || !this.camera) {
             throw new Error('Scene or Camera not present in glTF');
         }
@@ -67,10 +69,15 @@ class App extends Application {
     enableCamera() {
         this.canvas.requestPointerLock();
     }
+    
+    getSpawnpoint() {
+        return this.spawnpoints.children[Math.floor(Math.random() * this.spawnpoints.children.length)];
+    }
 
     cloneEnemy() {
         const enemyClone = this.enemy.clone();
-        enemyClone.init(this.player, this.prefabs, [-30, 6, 0], this.enemies);
+        const spawnpoint = this.getSpawnpoint()
+        enemyClone.init(this.player, this.prefabs, spawnpoint.translation, this.enemies);
     }
 
     pointerlockchangeHandler() {
